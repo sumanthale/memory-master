@@ -122,7 +122,7 @@ var stageSettings = [
 
 //game settings
 var gameSettings = {
-  timer: 180000,
+  timer: 8000,
   score: 30,
   flipSpeed: 0.3,
   matchSpeed: 0.3,
@@ -474,6 +474,7 @@ function startGame() {
   gameData.paused = false;
   gameData.stageNum = 1;
   gameData.particles = [];
+  playerData.score = 0;
 
   tweenData.tweenScore = 0;
   statusTxt.text = "";
