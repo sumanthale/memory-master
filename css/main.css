@@ -355,3 +355,35 @@ canvas {
     page-break-after: avoid;
   }
 }
+#walletLost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: none;
+  text-align: center;
+  line-height: 100%;
+}
+
+#walletLost h1 {
+  font-size: 2em;
+  color: #fff;
+  margin-top: 25%;
+}
+
+#transactionLoading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: none;
+}
+#transactionLoading img {
+  width: 100%;
+  height: 100%;
+}

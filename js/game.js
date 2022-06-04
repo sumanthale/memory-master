@@ -137,7 +137,7 @@ var textDisplay = {
   exitMessage: "Are you sure you want\nto quit game?",
   share: "Share your score:",
   resultTitle: "Game Over",
-  resultDesc: "you score [NUMBER]pts",
+  resultDesc: "Result: [NUMBER]pts [MULTIPLY]X",
 };
 
 //Social share, [SCORE] will replace with game score
@@ -190,6 +190,7 @@ var gravityData = {
   range: 100,
 };
 
+let bet;
 /*!
  *
  * GAME BUTTONS - This is the function that runs to setup button event
@@ -218,11 +219,71 @@ function Notify(text) {
   }
 }
 
-function buildGameButton() {
+async function buildGameButton() {
   buttonStart.cursor = "pointer";
-  buttonStart.addEventListener("click", function (evt) {
-    playSound("soundButton");
-    goPage("game");
+  buttonStart.addEventListener("click", async function (evt) {
+    const phantomWallet = cryptoUtils.phantomWallet;
+
+    try {
+      if (!phantomWallet.isConnected) {
+        console.log("phantomWallet is not connected");
+        await phantomWallet.connectWallet();
+      }
+      if (phantomWallet.isConnected) {
+        Swal.fire({
+          title: "Enter Your Bet (MAX 1 SOL)",
+          input: "text",
+          inputAttributes: {
+            autocapitalize: "off",
+          },
+          showCancelButton: false,
+          confirmButtonText: "Submit",
+          showLoaderOnConfirm: true,
+          preConfirm: (input) => {
+            console.log("preConfirm");
+            if (!input || input > 1) {
+              return Swal.showValidationMessage(
+                `Bet amount is greater than 1 SOl`
+              );
+            }
+          },
+          allowOutsideClick: false,
+        }).then(({ value: betAmount }) => {
+          phantomWallet
+            .requestTransaction(
+              Number(betAmount),
+              "AV1h6WN1mAS2zv5m1JxwFL5D7ne4sxKoj8unZsrC7zLv"
+            )
+            .then((result) => {
+              if (result) {
+                bet = {
+                  betAmount: Number(betAmount),
+                  gameName: "Memory Master",
+                  userTransactionID: result,
+                  typeOfPlay: "SOL",
+                };
+                Notify("Transaction Successful");
+                playSound("soundButton");
+                goPage("game");
+                stopSoundLoop("musicMain");
+                playSoundLoop("musicGame");
+                setSoundVolume("musicGame", 0.5);
+                initAnimateBubble(itemTimerBubble, 10);
+                initAnimateBubble(itemComboBubble, 10);
+                startGame();
+              }
+            })
+            .catch((err) => {
+              Notify("Please Approve Transaction");
+              console.log(err);
+            });
+        });
+      } else {
+        alert("Please connect to wallet");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   instructions.cursor = "pointer";
@@ -241,20 +302,6 @@ function buildGameButton() {
   buttonContinue.addEventListener("click", function (evt) {
     playSound("soundButton");
     goPage("main");
-  });
-
-  buttonFacebook.cursor = "pointer";
-  buttonFacebook.addEventListener("click", function (evt) {
-    share("facebook");
-  });
-
-  buttonTwitter.cursor = "pointer";
-  buttonTwitter.addEventListener("click", function (evt) {
-    share("twitter");
-  });
-  buttonWhatsapp.cursor = "pointer";
-  buttonWhatsapp.addEventListener("click", function (evt) {
-    share("whatsapp");
   });
 
   buttonSoundOff.cursor = "pointer";
@@ -375,58 +422,9 @@ function goPage(page) {
       stopSoundLoop("musicMain");
       playSoundLoop("musicGame");
       setSoundVolume("musicGame", 0.5);
-
       initAnimateBubble(itemTimerBubble, 10);
       initAnimateBubble(itemComboBubble, 10);
       startGame();
-      //   Swal.fire({
-      //     title: "Enter Your Bet",
-      //     input: "text",
-      //     inputAttributes: {
-      //       autocapitalize: "off",
-      //     },
-      //     showCancelButton: false,
-      //     confirmButtonText: "Submit",
-      //     showLoaderOnConfirm: true,
-      //     preConfirm: (input) => {
-      //       console.log("preConfirm");
-      //       if (!input || input > 0.5) {
-      //         return Swal.showValidationMessage(
-      //           `Request failed: Bet is greater than 0.5`
-      //         );
-      //       }
-      //     },
-      //     allowOutsideClick: false,
-      //   }).then((result) => {
-      //     const phantomWallet = new PhantomWallet();
-      //     if (!phantomWallet.isConnected) {
-      //       phantomWallet.connectWallet();
-      //     }
-      //     phantomWallet
-      //       .requestTransaction(
-      //         Number(result.value),
-      //         "AV1h6WN1mAS2zv5m1JxwFL5D7ne4sxKoj8unZsrC7zLv"
-      //       )
-      //       .then((result) => {
-      //         {
-      //           Notify("Transaction Successful");
-      //           console.log("Transaction Successful");
-      //           stopSoundLoop("musicMain");
-      //           playSoundLoop("musicGame");
-      //           setSoundVolume("musicGame", 0.5);
-
-      //           initAnimateBubble(itemTimerBubble, 10);
-      //           initAnimateBubble(itemComboBubble, 10);
-      //           startGame();
-      //         }
-      //       })
-      //       .catch((err) => {
-      //         Notify("Please Approve Transaction");
-      //         console.log(err);
-      //         con = false;
-      //         buttonRollDisabled.visible = false;
-      //       });
-      //   });
       break;
 
     case "result":
@@ -436,16 +434,81 @@ function goPage(page) {
 
       stopSoundLoop("musicGame");
       playSound("soundResult");
-
+      let multipler,
+        amountWon,
+        amountLost,
+        amountPaid,
+        gameResult = "WON";
+      const score = playerData.score;
+      if (score > 2500) {
+        multipler = 50;
+        amountWon = 50 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 2500 && score > 2000) {
+        multipler = 20;
+        amountWon = 20 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 2000 && score > 1750) {
+        multipler = 10;
+        amountWon = 10 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 1750 && score > 1500) {
+        multipler = 4;
+        amountWon = 4 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 1250 && score > 1000) {
+        multipler = 2;
+        amountWon = 2 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 1000 && score > 900) {
+        multipler = 1.5;
+        amountWon = 1.5 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 900 && score > 800) {
+        multipler = 1.2;
+        amountWon = 1.2 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 800 && score > 700) {
+        multipler = 1.1;
+        amountWon = 1.1 * bet.betAmount;
+        amountLost = 0;
+        amountPaid = amountWon - amountWon * 0.015;
+      } else if (score < 700 && score > 600) {
+        multipler = 0.8;
+        amountWon = 0.8 * bet.betAmount;
+        amountLost = bet.betAmount - amountWon;
+        amountPaid = amountWon - amountWon * 0.015;
+        gameResult = "LOSS";
+      } else {
+        multipler = 0;
+        amountWon = 0;
+        amountLost = bet.betAmount;
+        amountPaid = 0;
+        gameResult = "LOSS";
+      }
+      bet = {
+        ...bet,
+        multipler,
+        amountWon,
+        amountLost,
+        amountPaid,
+        gameResult,
+      };
       tweenData.tweenScore = 0;
       TweenMax.to(tweenData, 0.5, {
         tweenScore: playerData.score,
         overwrite: true,
         onUpdate: function () {
-          resultDescTxt.text = textDisplay.resultDesc.replace(
-            "[NUMBER]",
-            Math.floor(tweenData.tweenScore)
-          );
+          resultDescTxt.text = textDisplay.resultDesc
+            .replace("[NUMBER]", Math.floor(tweenData.tweenScore))
+            .replace("[MULTIPLY]", multipler);
         },
       });
 
@@ -511,15 +574,11 @@ function saveGame(score) {
     }
     toggleScoreboardSave(true);
   }
-
-  /*$.ajax({
-      type: "POST",
-      url: 'saveResults.php',
-      data: {score:score},
-      success: function (result) {
-          console.log(result);
-      }
-    });*/
+  axios.post(`${DB_URL}/api/memoryMaster`, {
+    walletID: window.cryptoUtils.phantomWallet.wallet_pubkey,
+    ...bet,
+    scorePoints: score,
+  });
 }
 
 /*!

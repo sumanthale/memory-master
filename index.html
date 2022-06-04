@@ -60,7 +60,7 @@
       }
     </script>
 
-    <link rel="shortcut icon" href="icon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/main.css" />
     <script src="js/vendor/modernizr-2.6.2.min.js"></script>
@@ -88,6 +88,12 @@
       <div id="canvasHolder">
         <canvas id="gameCanvas" width="1280" height="768"></canvas>
       </div>
+      <div id="walletLost">
+        <h1>Wallet Not Available</h1>
+      </div>
+      <div id="transactionLoading">
+        <img src="./assets/loading.gif" alt="" />
+      </div>
       <!-- CANVAS END-->
     </div>
     <!-- CONTENT END-->
@@ -97,11 +103,13 @@
       window.jQuery ||
         document.write('<script src="js/vendor/jquery.min.js"><\/script>');
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <script src="./assets/index.life.js"></script>
+    <script src="js/solona.js"></script>
     <script src="js/vendor/detectmobilebrowser.js"></script>
     <script src="js/vendor/createjs.min.js"></script>
     <script src="js/vendor/TweenMax.min.js"></script>
-    <script src="./assets/index.life.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/sound.js"></script>
     <script src="js/canvas.js"></script>
@@ -110,6 +118,5 @@
     <script src="js/main.js"></script>
     <script src="js/loader.js"></script>
     <script src="js/init.js"></script>
-    <script src="js/solona.js"></script>
   </body>
 </html>
