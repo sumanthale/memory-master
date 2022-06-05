@@ -223,13 +223,11 @@ async function buildGameButton() {
   buttonStart.cursor = "pointer";
   buttonStart.addEventListener("click", async function (evt) {
     const phantomWallet = cryptoUtils.phantomWallet;
+    console.log(phantomWallet);
+    await initPhantomWallet();
 
     try {
-      if (!phantomWallet.isConnected) {
-        console.log("phantomWallet is not connected");
-        await phantomWallet.connectWallet();
-      }
-      if (phantomWallet.isConnected) {
+      if (phantomWallet.isConnected && phantomWallet.isAuthenticated) {
         Swal.fire({
           title: "Enter Your Bet (MAX 1 SOL)",
           input: "text",
@@ -279,7 +277,7 @@ async function buildGameButton() {
             });
         });
       } else {
-        alert("Please connect to wallet");
+        alert("Please Connect and Sign Your PhantomWallet");
       }
     } catch (error) {
       console.log(error);

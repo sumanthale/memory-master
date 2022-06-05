@@ -195,17 +195,6 @@ class PhantomWallet {
       encodedMessage
     );
 
-    const token = await fetch(`${DB_URL}/sign`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        signature,
-        publicKey: publicKey.toBytes(),
-        key: this.wallet_pubkey,
-      }),
-    });
     let userDetails;
 
     try {
@@ -228,19 +217,24 @@ class PhantomWallet {
       };
     }
 
-    const register = await fetch(`${DB_URL}/api/user/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const { data: signData } = await axios.post(`${DB_URL}/sign`, {
+      signature,
+      publicKey: publicKey.toBytes(),
+      key: this.wallet_pubkey,
+      userData: {
         walletID: this.wallet_pubkey,
         ...userDetails,
-      }),
+      },
     });
-    const user = await register.json();
-    axios.defaults.headers.common["Authorization"] = user.accessToken;
-    localStorage.setItem("user", JSON.stringify(user));
+    console.log(signData);
+    if (signData) {
+      axios.defaults.headers.common["Authorization"] = signData.accessToken;
+      localStorage.setItem("user", JSON.stringify(signData));
+      const phantomObject = cryptoUtils.phantomWallet;
+      phantomObject.isAuthenticated = true;
+    } else {
+      alert("Invalid Credentials");
+    }
   }
 }
 
@@ -248,7 +242,7 @@ window.cryptoUtils = {
   phantomWallet: new PhantomWallet(),
 };
 
-(async function () {
+async function initPhantomWallet() {
   try {
     const phantomObject = cryptoUtils.phantomWallet;
     let user = localStorage.getItem("user");
@@ -269,4 +263,5 @@ window.cryptoUtils = {
   } catch (error) {
     console.log(error);
   }
-})();
+}
+initPhantomWallet();
