@@ -1,6 +1,7 @@
 const clusterApiUrl = solanaWeb3.clusterApiUrl("devnet");
 const recipient_pubkey = "..";
-const DB_URL = "https://solanaarcadegames.herokuapp.com";
+// const DB_URL = "https://solanaarcadegames.herokuapp.com";
+const DB_URL = "http://localhost:8080";
 
 class PhantomWallet {
   constructor() {
@@ -48,7 +49,7 @@ class PhantomWallet {
     }
   }
 
-  async requestTransaction(lamports, to_pubkey) {
+  async requestTransaction(lamports) {
     const transamount = Number((3 / 100) * lamports);
     // console.log(transamount);
     // console.log(lamports);
@@ -63,7 +64,7 @@ class PhantomWallet {
     document.getElementById("transactionLoading").style.display = "block";
     let signature = await this.createPhantomTransaction(
       clusterApiUrl,
-      to_pubkey,
+      "Gy4xSKsLHXScRMVZgKt5f6BvDawp1JW8PrenA3GbakCK",
       sol * solanaWeb3.LAMPORTS_PER_SOL,
       onTransacErr,
       onOtherErr,
@@ -249,7 +250,10 @@ async function initPhantomWallet() {
     await phantomObject.connectWallet();
 
     user = JSON.parse(user);
-    if (!!user && user.walletID === phantomObject.wallet_pubkey) {
+
+    const walletIDFromToken = parseJwt(user.accessToken);
+    if (!!user && walletIDFromToken === phantomObject.wallet_pubkey) {
+      console.log(walletIDFromToken);
       axios.defaults.headers.common["Authorization"] = user.accessToken;
       phantomObject.isAuthenticated = true;
     } else {
@@ -265,3 +269,23 @@ async function initPhantomWallet() {
   }
 }
 initPhantomWallet();
+
+function parseJwt(token) {
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  var jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+  const { exp, walletID } = JSON.parse(jsonPayload);
+
+  if (Date.now() >= exp * 1000) {
+    return null;
+  }
+
+  return walletID;
+}
