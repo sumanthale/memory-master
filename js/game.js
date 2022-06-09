@@ -448,37 +448,37 @@ function goPage(page) {
         amountWon = 20 * bet.betAmount;
         amountLost = 0;
         amountPaid = amountWon - amountWon * 0.015;
-      } else if (score < 2000 && score > 1750) {
+      } else if (score <= 2000 && score > 1750) {
         multipler = 10;
         amountWon = 10 * bet.betAmount;
         amountLost = 0;
         amountPaid = amountWon - amountWon * 0.015;
-      } else if (score < 1750 && score > 1500) {
+      } else if (score <= 1750 && score > 1500) {
         multipler = 4;
         amountWon = 4 * bet.betAmount;
         amountLost = 0;
         amountPaid = amountWon - amountWon * 0.015;
-      } else if (score < 1250 && score > 1000) {
+      } else if (score <= 1250 && score > 1000) {
         multipler = 2;
         amountWon = 2 * bet.betAmount;
         amountLost = 0;
         amountPaid = amountWon - amountWon * 0.015;
-      } else if (score < 1000 && score > 900) {
+      } else if (score <= 1000 && score > 900) {
         multipler = 1.5;
         amountWon = 1.5 * bet.betAmount;
         amountLost = 0;
         amountPaid = amountWon - amountWon * 0.015;
-      } else if (score < 900 && score > 800) {
+      } else if (score <= 900 && score > 800) {
         multipler = 1.2;
         amountWon = 1.2 * bet.betAmount;
         amountLost = 0;
         amountPaid = amountWon - amountWon * 0.015;
-      } else if (score < 800 && score > 700) {
+      } else if (score <= 800 && score > 700) {
         multipler = 1.1;
         amountWon = 1.1 * bet.betAmount;
         amountLost = 0;
         amountPaid = amountWon - amountWon * 0.015;
-      } else if (score < 700 && score > 600) {
+      } else if (score <= 700 && score > 600) {
         multipler = 0.8;
         amountWon = 0.8 * bet.betAmount;
         amountLost = bet.betAmount - amountWon;
