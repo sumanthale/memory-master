@@ -436,7 +436,7 @@ function goPage(page) {
         amountWon,
         amountLost,
         amountPaid,
-        gameResult = "WON";
+        gameResult = "WIN";
       const score = playerData.score;
       if (score > 2500) {
         multipler = 50;
