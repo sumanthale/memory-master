@@ -1,7 +1,7 @@
 const clusterApiUrl = solanaWeb3.clusterApiUrl("devnet");
 const recipient_pubkey = "..";
-// const DB_URL = "https://solanaarcadegames.herokuapp.com";
-const DB_URL = "http://localhost:8080";
+const DB_URL = "https://solanaarcadegames.herokuapp.com";
+// const DB_URL = "http://localhost:8080";
 
 class PhantomWallet {
   constructor() {
