@@ -251,9 +251,7 @@ async function initPhantomWallet() {
 
     user = JSON.parse(user);
 
-    const walletIDFromToken = parseJwt(user.accessToken);
-    if (!!user && walletIDFromToken === phantomObject.wallet_pubkey) {
-      console.log(walletIDFromToken);
+    if (!!user && parseJwt(user.accessToken) === phantomObject.wallet_pubkey) {
       axios.defaults.headers.common["Authorization"] = user.accessToken;
       phantomObject.isAuthenticated = true;
     } else {
