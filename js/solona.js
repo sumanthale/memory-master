@@ -1,4 +1,6 @@
-const clusterApiUrl = solanaWeb3.clusterApiUrl("devnet");
+let clusterApiUrl = null;
+// const clusterApiUrl = solanaWeb3.clusterApiUrl("devnet");
+
 const recipient_pubkey = "..";
 const DB_URL = "https://solanaarcadegames.herokuapp.com";
 // const DB_URL = "http://localhost:8080";
@@ -245,6 +247,11 @@ window.cryptoUtils = {
 
 async function initPhantomWallet() {
   try {
+    const { data } = await axios(`${DB_URL}/api/network?gameID=2`);
+    let network = data?.network;
+    if (network) clusterApiUrl = solanaWeb3.clusterApiUrl(network);
+    else clusterApiUrl = solanaWeb3.clusterApiUrl("devnet");
+
     const phantomObject = cryptoUtils.phantomWallet;
     let user = localStorage.getItem("user");
     await phantomObject.connectWallet();

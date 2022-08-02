@@ -122,7 +122,8 @@ var stageSettings = [
 
 //game settings
 var gameSettings = {
-  timer: 180000,
+  timer: 18000,
+  // timer: 180000,
   score: 30,
   flipSpeed: 0.3,
   matchSpeed: 0.3,
@@ -272,7 +273,10 @@ async function buildGameButton() {
               }
             })
             .catch((err) => {
-              Notify("Please Approve Transaction");
+              Notify("Transaction Failed / Approve Transaction");
+              document.getElementById("transactionLoading").style.display =
+                "none";
+              alert(err.message);
               console.log(err);
             });
         });
@@ -483,7 +487,6 @@ function goPage(page) {
         amountWon = 0.8 * bet.betAmount;
         amountLost = bet.betAmount - amountWon;
         amountPaid = amountWon - amountWon * 0.015;
-        gameResult = "LOSS";
       } else {
         multipler = 0;
         amountWon = 0;
