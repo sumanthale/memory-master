@@ -66,7 +66,7 @@ class PhantomWallet {
     document.getElementById("transactionLoading").style.display = "block";
     let signature = await this.createPhantomTransaction(
       clusterApiUrl,
-      "Gy4xSKsLHXScRMVZgKt5f6BvDawp1JW8PrenA3GbakCK",
+      "9hGdUyYCu5caHTA1Ng5UyT547oezjd1DZEtSMQs9EF8U",
       sol * solanaWeb3.LAMPORTS_PER_SOL,
       onTransacErr,
       onOtherErr,
