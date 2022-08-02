@@ -122,8 +122,7 @@ var stageSettings = [
 
 //game settings
 var gameSettings = {
-  timer: 18000,
-  // timer: 180000,
+  timer: 180000,
   score: 30,
   flipSpeed: 0.3,
   matchSpeed: 0.3,
